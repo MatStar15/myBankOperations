@@ -168,7 +168,7 @@ int main(){
         std::cout << "[3] Display all accounts" << std::endl;
         std::cout << "[4] Display all transfers" << std::endl;
         std::cout << "[5] Search for an account" << std::endl;
-        std::cout << "[6] Show transfers involving an account" << std::endl; //TODO
+        std::cout << "[6] Show transfers involving an account" << std::endl;
         std::cout << "[7] Deposit" << std::endl;
         std::cout << "[8] Withdraw" << std::endl;
         std::cout << "[9] Exit" << std::endl;

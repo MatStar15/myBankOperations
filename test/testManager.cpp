@@ -88,7 +88,7 @@ TEST_F(ManagerTest, SaveAccountsSuccessfully) {
 
     ASSERT_EQ(Manager::getAccountCount(), 4);
     auto retrievedAccount = Manager::getAccount(account->getAccountNumber());
-    ASSERT_EQ( retrievedAccount->getAccountNumber(), account->getAccountNumber()); ///FIXME: dereferencing retrievedAccount and account causes build error
+    ASSERT_EQ( retrievedAccount->getAccountNumber(), account->getAccountNumber());
 }
 
 TEST_F(ManagerTest, SaveTransfersSuccessfully) {
