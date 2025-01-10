@@ -151,14 +151,14 @@ void withdraw(){
 
 
 int main(){
+    Manager* manager = Manager::getInstance();
+
     std::string answer;
     std::cout << "start new sessions? [y/n]" << std::endl;
     std::cin >> answer;
     if(answer == "y" || answer == "Y"){
-        Manager::wipe();
+        manager->wipe();
     }
-
-    Manager* manager = Manager::getInstance();
 
 
     while(true){

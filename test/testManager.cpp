@@ -11,15 +11,17 @@ std::string NAME2 = "Jon_Doe";
 class ManagerTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        Manager::wipe();
+        Manager* manager = Manager::getInstance();
+        manager->wipe();
         auto account1 = std::make_shared<Account>(200.0, "test1");
         auto account2 = std::make_shared<Account>(100.0, "test2");
         auto account3 = std::make_shared<Account>(100.0, "test3");
     }
 
     void TearDown() override {
+        Manager* manager = Manager::getInstance();
         delete Manager::getInstance();
-        Manager::wipe();
+        manager->wipe();
     }
 };
 
@@ -47,34 +49,36 @@ TEST_F(ManagerTest, GetTransferReturnsCorrectTransfer) {
 TEST_F(ManagerTest, GetHolderAccountsReturnsCorrectAccounts) {
     auto account2 = std::make_shared<Account>(200.0, NAME2);
     auto account1 = std::make_shared<Account>(100.0, NAME2);
-    auto accounts = Manager::getHolderAccounts(NAME2);
-    ASSERT_EQ(accounts.size(), 2);
+    auto found_accounts = Manager::getHolderAccounts(NAME2);
+    ASSERT_EQ(found_accounts.size(), 2);
 }
 
 TEST_F(ManagerTest, GetHolderSenderTransfersReturnsCorrectTransfers) {
     auto transfer1 = std::make_shared<MoneyTransfer>(50.0, 1, 2);
     auto transfer2 = std::make_shared<MoneyTransfer>(100.0, 1, 3);
-    auto transfers = Manager::getHolderSenderTransfers(1);
-    ASSERT_EQ(transfers.size(), 2);
+    auto found_transfers = Manager::getHolderSenderTransfers(1);
+    ASSERT_EQ(found_transfers.size(), 2);
 }
 
 TEST_F(ManagerTest, GetHolderReceiverTransfersReturnsCorrectTransfers) {
     auto transfer1 = std::make_shared<MoneyTransfer>(50.0, 1, 2);
     auto transfer2 = std::make_shared<MoneyTransfer>(100.0, 3, 2);
-    auto transfers = Manager::getHolderReceiverTransfers(2);
-    ASSERT_EQ(transfers.size(), 2);
+    auto found_transfers = Manager::getHolderReceiverTransfers(2);
+    ASSERT_EQ(found_transfers.size(), 2);
 }
 
 /// Read and write tests
 
 TEST_F(ManagerTest, LoadAccountsSuccessfully) {
-    Manager::loadAccounts();
+    Manager* manager = Manager::getInstance();
+    manager->loadAccounts();
     ASSERT_EQ(Manager::getAccountCount(), 3);
 }
 
 
 TEST_F(ManagerTest, LoadTransfersSuccessfully) {
-    Manager::loadTransfers();
+    Manager* manager = Manager::getInstance();
+    manager->loadTransfers();
     ASSERT_EQ(Manager::getTransferCount(), 0);
 }
 

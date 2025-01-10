@@ -5,14 +5,14 @@
 #include "Manager.h"
 #include <memory>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 
-#define ACCOUNTS_FILE "bankAccounts.txt"
-#define TRANSFERS_FILE "transfers.txt"
+const std::string ACCOUNTS_FILE = "bankAccounts.txt";
+const std::string TRANSFERS_FILE = "transfers.txt";
 
-
-int Manager::transferCount = 0;
-int Manager::accountCount = 0;
 
 std::vector<std::shared_ptr<Account>> Manager::accounts;
 std::vector<std::shared_ptr<MoneyTransfer>> Manager::transfers;
@@ -24,14 +24,17 @@ void Manager::saveAccount(const Account &account) {
     std::ofstream file(ACCOUNTS_FILE, std::ios::app);
     file << account.getAccountNumber() << " " << account.getAccountHolder() << " " << account.getBalance() << std::endl;
     file.close();
-//    std::cout << "Account saved" << std::endl;
 }
 
 void Manager::saveTransfer(const MoneyTransfer &moneyTransfer) {
     std::ofstream file(TRANSFERS_FILE, std::ios::app);
-    file << moneyTransfer.getSenderAccount()->getAccountNumber() << " " << moneyTransfer.getReceiverAccount()->getAccountNumber() << " " << moneyTransfer.getAmount() <<  " " << moneyTransfer.getTransferNumber()<<std::endl;
+    file << moneyTransfer.getSenderAccount()->getAccountNumber()
+    << " " << moneyTransfer.getReceiverAccount()->getAccountNumber()
+    << " " << moneyTransfer.getAmount()
+    << " " << moneyTransfer.getTransferDate()
+    <<  " " << moneyTransfer.getTransferNumber()<<std::endl;
+    file << moneyTransfer.getReason() << std::endl;
     file.close();
-//    std::cout << "Transfer saved" << std::endl;
 }
 
 void Manager::loadAccounts() {
@@ -49,16 +52,41 @@ void Manager::loadAccounts() {
 
 void Manager::loadTransfers() {
     std::ifstream file(TRANSFERS_FILE);
-    if(file.is_open()) {
-        int senderAccountNumber, receiverAccountNumber, transferNumber;
-        double amount;
-        while (file >> senderAccountNumber >> receiverAccountNumber >> amount >> transferNumber) {
-            std::shared_ptr<Account> senderAccount = getAccount(senderAccountNumber);
-            std::shared_ptr<Account> receiverAccount = getAccount(receiverAccountNumber);
-            std::shared_ptr<MoneyTransfer>  moneyTransfer = std::make_shared<MoneyTransfer>(MoneyTransfer(amount, senderAccount, receiverAccount, transferNumber));
-        }
-        file.close();
+
+    if (!file.is_open()) {
+        std::cerr << "Unable to open file" << std::endl;
+        throw std::runtime_error("Unable to open file");
     }
+
+    std::string line;
+
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+
+            int senderAccountNumber, receiverAccountNumber, transferNumber;
+            double amount;
+            std::string transferDate, reason;
+
+        if (iss >> senderAccountNumber >> receiverAccountNumber >> amount >> transferDate >>transferNumber) // Parse first part of the transfer
+        {
+            if (std::getline(file, line)) // Parse second part of the transfer, aka the reason
+            {
+                std::shared_ptr<Account> senderAccount = getAccount(senderAccountNumber);
+                std::shared_ptr<Account> receiverAccount = getAccount(receiverAccountNumber);
+                std::shared_ptr<MoneyTransfer>  moneyTransfer = std::make_shared<MoneyTransfer>(
+                    MoneyTransfer(amount, transferDate, line, senderAccount, receiverAccount, transferNumber));
+            }else
+            {
+                throw std::runtime_error("Unable to parse transfer reason");
+            }
+
+        }else
+        {
+            throw std::runtime_error("Unable to parse transfer");
+        }
+    }
+    file.close();
 }
 
 std::shared_ptr<Account> Manager::getAccount(int accountNumber) {
@@ -94,12 +122,24 @@ void Manager::saveAllTransfers() {
 
 void Manager::addAccount(const std::shared_ptr<Account>& account) {
     accounts.push_back(account);
-    accountCount++;
 }
 
 void Manager::addTransfer(const std::shared_ptr<MoneyTransfer>& moneyTransfer) {
     transfers.push_back(moneyTransfer);
-    transferCount++;
+}
+
+void Manager::removeTransfer(const std::shared_ptr<MoneyTransfer>& moneyTransfer)
+{
+    for (auto it = transfers.begin(); it != transfers.end(); ++it) {
+        if (*it == moneyTransfer) {
+            transfers.erase(it); // Delete the transfer from the manager
+
+            // Reverse the transfer:
+            moneyTransfer->getReceiverAccount()->withdraw(moneyTransfer->getAmount());
+            moneyTransfer->getSenderAccount()->deposit(moneyTransfer->getAmount());
+            break;
+        }
+    }
 }
 
 void Manager::wipe() {
@@ -117,13 +157,38 @@ void Manager::save() {
     saveAllTransfers();
 }
 
+std::vector<std::shared_ptr<Account>> Manager::getTransfersOfAccount(int accountNumber)
+{
+    std::vector<std::shared_ptr<Account>> found = {};
+    for (const auto &account : accounts) {
+        if (account->getAccountNumber() == accountNumber) {
+            for (const auto &transfer : transfers)
+            {
+                if (transfer->getSenderAccount()->getAccountNumber() == accountNumber || transfer->getReceiverAccount()->getAccountNumber() == accountNumber) {
+                    found.push_back(account);
+                }
+            }
+        }
+    }
+    return found;
+}
+
+std::vector<std::shared_ptr<MoneyTransfer>> Manager::getTransfersByDate(const std::string& date)
+{
+    std::vector<std::shared_ptr<MoneyTransfer>> found = {};
+    for (const auto &transfer : transfers) {
+        if (transfer->getTransferDate() == date) {
+            found.push_back(transfer);
+        }
+    }
+    return found;
+}
+
 Manager::~Manager() {
-    instance = nullptr;
     save();
     accounts.clear();
     transfers.clear();
-    transferCount = 0;
-    accountCount = 0;
+    instance = nullptr;
 }
 
 std::vector<std::shared_ptr<Account>> Manager::getHolderAccounts(const std::string &holderName) {

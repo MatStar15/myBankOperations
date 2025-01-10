@@ -13,6 +13,8 @@ class MoneyTransfer {
 private:
     double amount;
     int transferNumber;
+    std::string reason;
+    std::string transferDate;
     std::shared_ptr<Account> senderAccount;
     std::shared_ptr<Account> receiverAccount;
 public:
@@ -24,21 +26,30 @@ public:
     }
 
     // Constructor when the transfer is loaded from disk
-    explicit MoneyTransfer(double amount, std::shared_ptr<Account> senderAccount, std::shared_ptr<Account> receiverAccount, int transferNumber);
+    MoneyTransfer(double amount, std::string date,std::string reason, std::shared_ptr<Account> senAccount,
+                             std::shared_ptr<Account> recAccount, int transferNumber);
 
     // Constructor when the transfer is made
-    explicit MoneyTransfer(double amount, std::shared_ptr<Account> senderAccount, std::shared_ptr<Account> receiverAccount);
+    MoneyTransfer(double amount, std::string date, std::shared_ptr<Account> senderAccount, std::shared_ptr<Account> receiverAccount, std::string reason = " ");
+    MoneyTransfer(double amnt, std::shared_ptr<Account> senAccount,std::shared_ptr<Account> recAccount, const std::string& r = " ");
 
-    explicit MoneyTransfer(double amount, int senderAccount, int receiverAccount);
+    // Mainly for testing purposes
+    MoneyTransfer(double amount, int senderAccountID, int receiverAccountID);
 
-
-
-
+    MoneyTransfer(double amount,std::string date, std::string reason, int senderAccountID, int receiverAccountID);
 
     MoneyTransfer() = delete;
 
     double getAmount() const{
         return amount;
+    }
+
+    std::string getTransferDate() const{
+        return transferDate;
+    }
+
+    std::string getReason() const{
+        return reason;
     }
 
     std::shared_ptr<Account> getSenderAccount() const{

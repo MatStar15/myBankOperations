@@ -24,13 +24,13 @@ Account::Account(double balance, std::string accountHolder) : Account(balance, M
 
 
 
-void Account::transfer(std::shared_ptr<Account> account, double amount) {
+void Account::transfer(const std::shared_ptr<Account>& account, double amount, const std::string& reason) {
     if (balance >= amount) {
         balance -= amount;
         account->deposit(amount);
 
 
-       std::shared_ptr<MoneyTransfer> transfer = std::make_shared<MoneyTransfer>(amount, std::make_shared<Account>(*this), account);
+       std::shared_ptr<MoneyTransfer> transfer = std::make_shared<MoneyTransfer>(amount, std::make_shared<Account>(*this), account, reason);
 
     } else {
         throw std::invalid_argument("Insufficient funds");

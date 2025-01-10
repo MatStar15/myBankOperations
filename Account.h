@@ -61,7 +61,7 @@ public:
         balance -= amount;
     }
 
-    void transfer(std::shared_ptr<Account> account, double amount);
+    void transfer(const std::shared_ptr<Account>& account, double amount, const std::string& reason = "");
 
     void displayAccount() const;
 };

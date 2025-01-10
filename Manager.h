@@ -18,7 +18,6 @@
 
 class Manager {
 private:
-
     static Manager* instance;
 
     Manager(){
@@ -26,14 +25,12 @@ private:
         loadTransfers();
     }
 
+    //Need to be static to be accessed by Transfer and Account constructors without getting instance of Manager every time
     static std::vector<std::shared_ptr<Account>> accounts;
     static std::vector<std::shared_ptr<MoneyTransfer>> transfers;
 
-    static int transferCount;
-    static int accountCount;
-
-    static void saveAllAccounts();
-    static void saveAllTransfers();
+    void saveAllAccounts();
+    void saveAllTransfers();
 
 public:
     Manager(const Manager&) = delete;
@@ -46,49 +43,53 @@ public:
         return instance;
     }
 
-    static void saveAccount(const Account &account);
-    static void saveTransfer(const MoneyTransfer &moneyTransfer);
+    void saveAccount(const Account &account);
+    void saveTransfer(const MoneyTransfer &moneyTransfer);
 
     static void addAccount(const std::shared_ptr<Account>& account);
     static void addTransfer(const std::shared_ptr<MoneyTransfer>& moneyTransfer);
 
-    static void wipe();
-    static void save();
+    void removeTransfer(const std::shared_ptr<MoneyTransfer>& moneyTransfer);
 
+    void wipe();
+    void save();
 
-    static void loadAccounts();
-    static void loadTransfers();
+    void loadAccounts();
+    void loadTransfers();
 
     static std::shared_ptr<Account> getAccount(int accountNumber);
     static std::shared_ptr<MoneyTransfer> getTransfer(int transferNumber);
 
-    static std::vector<std::shared_ptr<Account>> getHolderAccounts(const std::string &holderName);
-    static std::vector<std::shared_ptr<MoneyTransfer>> getHolderSenderTransfers(const int senderAccountNumber);
-    static std::vector<std::shared_ptr<MoneyTransfer>> getHolderReceiverTransfers(const int receiverAccountNumber);
+    std::vector<std::shared_ptr<Account>> getHolderAccounts(const std::string &holderName);
+    std::vector<std::shared_ptr<MoneyTransfer>> getHolderSenderTransfers(int senderAccountNumber);
+    std::vector<std::shared_ptr<MoneyTransfer>> getHolderReceiverTransfers(int receiverAccountNumber);
+
 
     static int getTransferCount(){
-        return transferCount;
+        return transfers.size();
     }
 
     static int getAccountCount(){
-        return accountCount;
+        return accounts.size();
     }
 
-    static void displayAllAccounts(){
+    void displayAllAccounts(){
         for(const auto &account : accounts){
             account->displayAccount();
         }
     }
 
-    static void displayAllTransfers(){
+    void displayAllTransfers(){
         for(const auto &transfer : transfers){
             transfer->displayTransfer();
         }
     }
 
+    std::vector<std::shared_ptr<Account>> getTransfersOfAccount(int accountNumber);
+
+    std::vector<std::shared_ptr<MoneyTransfer>> getTransfersByDate(const std::string& date);
+
     ~Manager();
-
-
 };
 
 
