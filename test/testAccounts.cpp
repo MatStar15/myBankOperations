@@ -2,6 +2,7 @@
 // Created by Mat on 25/11/2024.
 //
 
+#include "MoneyTransfer.h"
 #include "gtest/gtest.h"
 #include "..\Account.h"
 
@@ -53,4 +54,13 @@ TEST_F(AccountTest, TransferNegativeAmountThrowsException) {
 TEST_F(AccountTest, TransferMoreThanBalanceThrowsException) {
     auto targetAccount = std::make_shared<Account>(50.0, NAME);
     ASSERT_THROW(account->transfer(targetAccount, 150.0), std::invalid_argument);
+}
+
+TEST_F(AccountTest, TransferToNullptrThrowsException) {
+    ASSERT_THROW(account->transfer(nullptr, 50.0), std::invalid_argument);
+}
+
+TEST_F(AccountTest, InvalidTransferDateThrowsException) {
+    auto targetAccount = std::make_shared<Account>(50.0, NAME);
+    ASSERT_THROW(MoneyTransfer(50, "Invalid Date", account, targetAccount), std::invalid_argument);
 }

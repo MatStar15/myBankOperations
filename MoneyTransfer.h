@@ -21,8 +21,10 @@ public:
     bool operator==(const MoneyTransfer &rhs) const {
         return amount == rhs.amount &&
                transferNumber == rhs.transferNumber &&
-               senderAccount == rhs.senderAccount &&
-               receiverAccount == rhs.receiverAccount;
+               senderAccount->getAccountNumber() == rhs.senderAccount->getAccountNumber() &&
+               receiverAccount->getAccountNumber() == rhs.receiverAccount->getAccountNumber() &&
+               reason == rhs.reason &&
+               transferDate == rhs.transferDate;
     }
 
     // Constructor when the transfer is loaded from disk

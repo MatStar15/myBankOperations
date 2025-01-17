@@ -47,23 +47,27 @@ TEST_F(ManagerTest, GetTransferReturnsCorrectTransfer) {
 }
 
 TEST_F(ManagerTest, GetHolderAccountsReturnsCorrectAccounts) {
+    Manager* manager = Manager::getInstance();
+
     auto account2 = std::make_shared<Account>(200.0, NAME2);
     auto account1 = std::make_shared<Account>(100.0, NAME2);
-    auto found_accounts = Manager::getHolderAccounts(NAME2);
+    auto found_accounts = manager->getHolderAccounts(NAME2);
     ASSERT_EQ(found_accounts.size(), 2);
 }
 
 TEST_F(ManagerTest, GetHolderSenderTransfersReturnsCorrectTransfers) {
+    Manager* manager = Manager::getInstance();
     auto transfer1 = std::make_shared<MoneyTransfer>(50.0, 1, 2);
     auto transfer2 = std::make_shared<MoneyTransfer>(100.0, 1, 3);
-    auto found_transfers = Manager::getHolderSenderTransfers(1);
+    auto found_transfers = manager->getHolderSenderTransfers(1);
     ASSERT_EQ(found_transfers.size(), 2);
 }
 
 TEST_F(ManagerTest, GetHolderReceiverTransfersReturnsCorrectTransfers) {
+    Manager* manager = Manager::getInstance();
     auto transfer1 = std::make_shared<MoneyTransfer>(50.0, 1, 2);
     auto transfer2 = std::make_shared<MoneyTransfer>(100.0, 3, 2);
-    auto found_transfers = Manager::getHolderReceiverTransfers(2);
+    auto found_transfers = manager->getHolderReceiverTransfers(2);
     ASSERT_EQ(found_transfers.size(), 2);
 }
 
@@ -101,8 +105,26 @@ TEST_F(ManagerTest, SaveTransfersSuccessfully) {
     delete Manager::getInstance();
     Manager::getInstance();
 
-
     ASSERT_EQ(Manager::getTransferCount(), 1);
     auto retrievedTransfer = Manager::getTransfer(transfer->getTransferNumber());
+
+    ASSERT_EQ(*retrievedTransfer, *transfer);
     ASSERT_EQ(retrievedTransfer->getTransferNumber(), transfer->getTransferNumber());
+    ASSERT_EQ(retrievedTransfer->getAmount(), transfer->getAmount());
+    ASSERT_EQ(retrievedTransfer->getSenderAccount()->getAccountNumber(), transfer->getSenderAccount()->getAccountNumber());
+    ASSERT_EQ(retrievedTransfer->getReceiverAccount()->getAccountNumber(), transfer->getReceiverAccount()->getAccountNumber());
+    ASSERT_EQ(retrievedTransfer->getReason(), transfer->getReason());
+    ASSERT_EQ(retrievedTransfer->getTransferDate(), transfer->getTransferDate());
+
+}
+
+TEST_F(ManagerTest, searchTransfersByDate)
+{
+    Manager* manager = Manager::getInstance();
+    auto transfer1 = std::make_shared<MoneyTransfer>(50.0, 1, 2);
+    auto transfer2 = std::make_shared<MoneyTransfer>(100.0, 3, 2);
+
+
+    auto found_transfers = manager->getTransfersByDate(transfer1->getTransferDate());
+    ASSERT_EQ(found_transfers.size(), 2);
 }
