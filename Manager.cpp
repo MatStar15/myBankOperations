@@ -54,8 +54,17 @@ void Manager::loadTransfers() {
     std::ifstream file(TRANSFERS_FILE);
 
     if (!file.is_open()) {
-        std::cerr << "Unable to open file" << std::endl;
-        throw std::runtime_error("Unable to open file");
+        std::ofstream ofs;
+        ofs.open(TRANSFERS_FILE, std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+
+        file.open(TRANSFERS_FILE);
+
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Unable to open or create transfers file");
+        }
+
     }
 
     std::string line;
