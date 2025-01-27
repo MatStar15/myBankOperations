@@ -5,9 +5,11 @@
 #include "MoneyTransfer.h"
 #include "Manager.h"
 #include <iostream>
+#include <sstream>
 #include <utility>
 #include <ctime>
 #include <iomanip>
+
 const char* FORMAT = "%d-%m-%Y--%H-%M-%S";
 
 std::string currentTimeAsString()

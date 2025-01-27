@@ -3,8 +3,9 @@
 //
 
 #include "gtest/gtest.h"
-#include "..\Manager.h"
+#include "../Manager.h"
 #include <memory>
+
 
 std::string NAME2 = "Jon_Doe";
 

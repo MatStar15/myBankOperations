@@ -6,16 +6,17 @@
 #include "MoneyTransfer.h"
 #include "Manager.h"
 #include <iostream>
+#include <sstream>
 #include <memory>
 
 
 Account::Account(double balance, int accountNumber, std::string accountHolder): balance(balance), accountNumber(accountNumber),
                                                                                 accountHolder(std::move(accountHolder)) {
-    Manager::addAccount(std::make_shared<Account>(*this));
-
     if(balance < 0) {
         throw std::invalid_argument("Balance cannot be negative");
     }
+
+    Manager::addAccount(std::make_shared<Account>(*this));
 }
 
 

@@ -4,7 +4,7 @@
 
 #include "MoneyTransfer.h"
 #include "gtest/gtest.h"
-#include "..\Account.h"
+#include "../Account.h"
 
 std::string NAME = "AccountTest";
 

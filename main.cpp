@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <sstream>
 #include "Manager.h"
 
 void createAccount(){
@@ -52,10 +53,11 @@ void createTransfer(){
 }
 
 void searchAccountByHolder () {
+    Manager* manager = Manager::getInstance();
     std::string holderName;
     std::cout << "Enter the account holder name: " << std::endl;
     std::cin >> holderName;
-    std::vector<std::shared_ptr<Account>> accounts = Manager::getHolderAccounts(holderName);
+    std::vector<std::shared_ptr<Account>> accounts = manager->getHolderAccounts(holderName);
     if (accounts.empty()) {
         std::cout << "No accounts found for " << holderName << std::endl;
     } else {
@@ -67,7 +69,8 @@ void searchAccountByHolder () {
 }
 
 void searchOutgoingTransfersByAccountNumber (int accountNumber) {
-    std::vector<std::shared_ptr<MoneyTransfer>> transfers = Manager::getHolderSenderTransfers(accountNumber);
+    Manager* manager = Manager::getInstance();
+    std::vector<std::shared_ptr<MoneyTransfer>> transfers = manager->getHolderSenderTransfers(accountNumber);
     if(transfers.empty()){
         std::cout << "No transfers found for account number " << accountNumber << std::endl;
     } else {
@@ -78,7 +81,8 @@ void searchOutgoingTransfersByAccountNumber (int accountNumber) {
 }
 
 void searchIncomingTransfersByAccountNumber (int accountNumber) {
-    std::vector<std::shared_ptr<MoneyTransfer>> transfers = Manager::getHolderReceiverTransfers(accountNumber);
+    Manager* manager = Manager::getInstance();
+    std::vector<std::shared_ptr<MoneyTransfer>> transfers = manager->getHolderReceiverTransfers(accountNumber);
     if (transfers.empty()) {
         std::cout << "No transfers found for account number " << accountNumber << std::endl;
     } else {
@@ -183,10 +187,10 @@ int main(){
                 createTransfer();
                 break;
             case 3:
-                Manager::displayAllAccounts();
+                manager->displayAllAccounts();
                 break;
             case 4:
-                Manager::displayAllTransfers();
+                manager->displayAllTransfers();
                 break;
             case 5:
                 searchAccountByHolder();
